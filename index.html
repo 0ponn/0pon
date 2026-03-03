@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>0pon</title>
+  <link id="favicon" rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
   <style>
     * {
       margin: 0;
@@ -264,6 +265,61 @@
         createNebula();
         createStars();
       });
+    })();
+
+    // Spinning coin favicon
+    (function() {
+      const size = 32;
+      const canvas = document.createElement('canvas');
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+      const favicon = document.getElementById('favicon');
+      let angle = 0;
+
+      function drawCoin() {
+        ctx.clearRect(0, 0, size, size);
+
+        const scaleX = Math.cos(angle);
+        const cx = size / 2;
+        const cy = size / 2;
+        const r = 14;
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(scaleX, 1);
+
+        // Coin edge (visible when rotated)
+        if (Math.abs(scaleX) < 0.9) {
+          ctx.fillStyle = '#888';
+          ctx.fillRect(-2, -r, 4, r * 2);
+        }
+
+        // Coin face - white with subtle border
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.fillStyle = '#fff';
+        ctx.fill();
+        ctx.strokeStyle = '#aaa';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // "0" on the coin - monospace style
+        if (Math.abs(scaleX) > 0.2) {
+          ctx.fillStyle = '#000';
+          ctx.font = '18px Courier New, monospace';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText('0', 0, 1);
+        }
+
+        ctx.restore();
+
+        angle += 0.08;
+        favicon.href = canvas.toDataURL('image/png');
+      }
+
+      setInterval(drawCoin, 50);
     })();
   </script>
 </body>
