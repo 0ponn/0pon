@@ -9,7 +9,6 @@ Portfolio landing page for 0pon.com services.
 
 ## Features
 
-- Deep space theme with twinkling stars and nebula clouds
 - Links to all apps: witchat, enjoyyy, textarea, cage, matrix, forums
 - Single HTML file, served via Python http.server
 - Cloudflare tunnel for HTTPS
