@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>0pon</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #000;
+      color: #fff;
+      font-family: 'Courier New', Courier, monospace;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    h1 {
+      font-size: 3rem;
+      font-weight: 400;
+      letter-spacing: 0.3em;
+      color: #fff;
+    }
+
+    .apps {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .app-card {
+      display: block;
+      padding: 1.25rem 1.5rem;
+      border: 1px solid #333;
+      text-decoration: none;
+      color: #fff;
+      transition: all 0.2s ease;
+    }
+
+    .app-card:hover {
+      border-color: #fff;
+      transform: translateX(4px);
+    }
+
+    .app-name {
+      font-size: 1.1rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .app-desc {
+      font-size: 0.85rem;
+      color: #888;
+    }
+
+    .app-card:hover .app-desc {
+      color: #aaa;
+    }
+  </style>
+  <!-- PostHog Analytics -->
+  <script>
+    !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+    posthog.init('phc_yxLUcKStd9HHT5OEIK2lMW4op1qvtVNUncNARjPxIci', {
+      api_host: 'https://us.i.posthog.com',
+      person_profiles: 'identified_only'
+    });
+    // Track app card clicks
+    document.addEventListener('DOMContentLoaded', function() {
+      document.querySelectorAll('.app-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          var appName = this.querySelector('.app-name').textContent;
+          posthog.capture('app_clicked', { app: appName });
+        });
+      });
+    });
+  </script>
+</head>
+<body>
+  <canvas id="motes"></canvas>
+
+  <div class="container">
+    <header>
+      <h1>0pon</h1>
+    </header>
+
+    <div class="apps">
+      <a href="https://witchat.0pon.com" class="app-card">
+        <div class="app-name">witchat</div>
+        <div class="app-desc">anonymous ephemeral chat</div>
+      </a>
+
+      <a href="https://enjoyyy.0pon.com" class="app-card">
+        <div class="app-name">enjoyyy</div>
+        <div class="app-desc">anonymous music sharing</div>
+      </a>
+
+      <a href="https://textarea.0pon.com" class="app-card">
+        <div class="app-name">textarea</div>
+        <div class="app-desc">url-based text editor</div>
+      </a>
+
+      <a href="https://cage.0pon.com" class="app-card">
+        <div class="app-name">cage</div>
+        <div class="app-desc">scg automation system</div>
+      </a>
+
+      <a href="https://chat.0pon.com" class="app-card">
+        <div class="app-name">matrix</div>
+        <div class="app-desc">federated chat (district homies)</div>
+      </a>
+
+      <a href="https://forums.0pon.com" class="app-card">
+        <div class="app-name">forums</div>
+        <div class="app-desc">discussion forum</div>
+      </a>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      const canvas = document.getElementById('motes');
+      const ctx = canvas.getContext('2d');
+      let stars = [];
+      let nebulaCanvas = null;
+      let animationId;
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+
+      function createNebula() {
+        nebulaCanvas = document.createElement('canvas');
+        nebulaCanvas.width = canvas.width;
+        nebulaCanvas.height = canvas.height;
+        const nctx = nebulaCanvas.getContext('2d');
+
+        const colors = [
+          { r: 90, g: 50, b: 130 },   // purple
+          { r: 50, g: 70, b: 120 },   // blue
+          { r: 120, g: 50, b: 80 },   // magenta
+          { r: 130, g: 60, b: 60 },   // dusty red
+          { r: 50, g: 90, b: 110 }    // teal
+        ];
+
+        // Create 3-5 nebula clusters
+        const clusterCount = 3 + Math.floor(Math.random() * 3);
+        for (let c = 0; c < clusterCount; c++) {
+          const cx = Math.random() * canvas.width;
+          const cy = Math.random() * canvas.height;
+          const color = colors[Math.floor(Math.random() * colors.length)];
+          const blobCount = 40 + Math.floor(Math.random() * 30);
+
+          // Each cluster is made of many overlapping soft circles
+          for (let i = 0; i < blobCount; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const dist = Math.random() * 300 + 50;
+            const x = cx + Math.cos(angle) * dist * (0.5 + Math.random());
+            const y = cy + Math.sin(angle) * dist * (0.5 + Math.random());
+            const radius = Math.random() * 150 + 50;
+            const opacity = Math.random() * 0.06 + 0.02;
+
+            const gradient = nctx.createRadialGradient(x, y, 0, x, y, radius);
+            gradient.addColorStop(0, 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',' + opacity + ')');
+            gradient.addColorStop(0.5, 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',' + (opacity * 0.5) + ')');
+            gradient.addColorStop(1, 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',0)');
+            nctx.fillStyle = gradient;
+            nctx.beginPath();
+            nctx.arc(x, y, radius, 0, Math.PI * 2);
+            nctx.fill();
+          }
+        }
+      }
+
+      function drawNebula() {
+        if (nebulaCanvas) {
+          ctx.drawImage(nebulaCanvas, 0, 0);
+        }
+      }
+
+      function createStars() {
+        const count = Math.floor((window.innerWidth * window.innerHeight) / 8000);
+        stars = [];
+        for (let i = 0; i < count; i++) {
+          // Star colors based on real stellar classification
+          const colorRoll = Math.random();
+          let r = 255, g = 255, b = 255;
+          if (colorRoll < 0.08) { r = 155; g = 175; b = 255; } // blue (hot stars)
+          else if (colorRoll < 0.15) { r = 200; g = 220; b = 255; } // blue-white
+          else if (colorRoll < 0.25) { r = 255; g = 250; b = 230; } // yellow-white
+          else if (colorRoll < 0.35) { r = 255; g = 220; b = 180; } // yellow
+          else if (colorRoll < 0.42) { r = 255; g = 180; b = 100; } // orange
+          else if (colorRoll < 0.48) { r = 255; g = 120; b = 80; } // orange-red
+          else if (colorRoll < 0.52) { r = 255; g = 80; b = 60; } // red (cool stars)
+
+          stars.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 1.2 + 0.3,
+            baseOpacity: Math.random() * 0.5 + 0.2,
+            opacity: 0,
+            twinkleSpeed: Math.random() * 0.015 + 0.005,
+            twinklePhase: Math.random() * Math.PI * 2,
+            r: r, g: g, b: b
+          });
+        }
+      }
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        drawNebula();
+
+        stars.forEach(function(star) {
+          // Twinkle using sine wave
+          star.twinklePhase += star.twinkleSpeed;
+          star.opacity = star.baseOpacity + Math.sin(star.twinklePhase) * 0.3;
+          star.opacity = Math.max(0.05, Math.min(0.9, star.opacity));
+
+          ctx.beginPath();
+          ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+          ctx.fillStyle = 'rgba(' + star.r + ',' + star.g + ',' + star.b + ',' + star.opacity + ')';
+          ctx.fill();
+        });
+
+        animationId = requestAnimationFrame(animate);
+      }
+
+      resize();
+      createNebula();
+      createStars();
+      animate();
+
+      window.addEventListener('resize', function() {
+        resize();
+        createNebula();
+        createStars();
+      });
+    })();
+  </script>
+</body>
+</html>
