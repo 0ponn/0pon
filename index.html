@@ -206,18 +206,22 @@
       border-color: rgba(212, 175, 55, 0.3);
     }
 
-    .about-link {
-      display: block;
+    .footer-links {
       text-align: center;
       margin-top: 3rem;
+      opacity: 0;
+      animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s forwards;
+    }
+
+    .about-link {
+      display: inline-block;
+      margin: 0 1rem;
       color: #444;
       text-decoration: none;
       font-size: 0.85rem;
       letter-spacing: 0.1em;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       cursor: pointer;
-      opacity: 0;
-      animation: fadeIn 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.5s forwards;
     }
 
     .about-link:hover {
@@ -499,7 +503,10 @@
       </div>
     </div>
 
-    <span class="about-link" id="about-open">about</span>
+    <div class="footer-links">
+      <a href="https://docs.0pon.com" class="about-link">docs</a>
+      <span class="about-link" id="about-open">about</span>
+    </div>
   </div>
 
   <div class="modal" id="ts3-modal">
