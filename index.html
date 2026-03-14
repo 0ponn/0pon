@@ -124,6 +124,88 @@
       color: #999;
     }
 
+    .app-details {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease, margin 0.3s ease;
+      opacity: 0;
+      margin-top: 0;
+    }
+
+    .app-card.expanded .app-details {
+      max-height: 500px;
+      opacity: 1;
+      margin-top: 1rem;
+    }
+
+    .app-details p {
+      font-size: 0.8rem;
+      color: #777;
+      line-height: 1.7;
+      margin-bottom: 0.75rem;
+    }
+
+    .app-details ul {
+      list-style: none;
+      padding: 0;
+      margin: 0 0 0.75rem 0;
+    }
+
+    .app-details li {
+      font-size: 0.8rem;
+      color: #666;
+      padding-left: 1rem;
+      position: relative;
+      margin-bottom: 0.4rem;
+      line-height: 1.5;
+    }
+
+    .app-details li::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      color: rgba(212, 175, 55, 0.6);
+    }
+
+    .app-details .app-link {
+      display: inline-block;
+      margin-top: 0.5rem;
+      padding: 0.4rem 0.8rem;
+      border: 1px solid #333;
+      border-radius: 2px;
+      color: #888;
+      text-decoration: none;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .app-details .app-link:hover {
+      border-color: rgba(212, 175, 55, 0.6);
+      color: rgba(212, 175, 55, 0.9);
+    }
+
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .app-toggle {
+      font-size: 0.7rem;
+      color: #444;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+
+    .app-card.expanded .app-toggle {
+      transform: rotate(90deg);
+      color: rgba(212, 175, 55, 0.7);
+    }
+
+    .app-card.expanded {
+      border-color: rgba(212, 175, 55, 0.3);
+    }
+
     .about-link {
       display: block;
       text-align: center;
@@ -233,12 +315,28 @@
         maskTextSelector: null
       }
     });
-    // Track app card clicks
+    // Track and handle app card interactions
     document.addEventListener('DOMContentLoaded', function() {
       document.querySelectorAll('.app-card').forEach(function(card) {
-        card.addEventListener('click', function() {
+        card.addEventListener('click', function(e) {
+          // Don't toggle if clicking a link inside
+          if (e.target.tagName === 'A') return;
+
           var appName = this.querySelector('.app-name').textContent;
-          posthog.capture('app_clicked', { app: appName });
+          var isExpanded = this.classList.contains('expanded');
+
+          // Collapse all others
+          document.querySelectorAll('.app-card.expanded').forEach(function(c) {
+            if (c !== card) c.classList.remove('expanded');
+          });
+
+          // Toggle this one
+          this.classList.toggle('expanded');
+
+          // Track expansion
+          if (!isExpanded) {
+            posthog.capture('app_expanded', { app: appName });
+          }
         });
       });
     });
@@ -253,40 +351,152 @@
     </header>
 
     <div class="apps">
-      <a href="https://witchat.0pon.com" class="app-card">
-        <div class="app-name">witchat</div>
-        <div class="app-desc">anonymous ephemeral chat</div>
-      </a>
+      <div class="app-card" data-url="https://witchat.0pon.com">
+        <div class="app-header">
+          <div>
+            <div class="app-name">witchat</div>
+            <div class="app-desc">anonymous ephemeral chat</div>
+          </div>
+          <span class="app-toggle">›</span>
+        </div>
+        <div class="app-details">
+          <p>Ephemeral conversations that fade like spoken words. No archives, no history.</p>
+          <ul>
+            <li>Messages blur and fade over time (Rule of Three)</li>
+            <li>Slash commands: /help, /whisper, /subscribe, /mood</li>
+            <li>Topic subscriptions with notifications</li>
+            <li>Visible whispers - others see you're DMing but not what</li>
+            <li>Room mood shifts based on conversation sentiment</li>
+          </ul>
+          <a href="https://witchat.0pon.com" class="app-link">open witchat →</a>
+        </div>
+      </div>
 
-      <a href="https://enjoyyy.0pon.com" class="app-card">
-        <div class="app-name">enjoyyy</div>
-        <div class="app-desc">anonymous music sharing</div>
-      </a>
+      <div class="app-card" data-url="https://enjoyyy.0pon.com">
+        <div class="app-header">
+          <div>
+            <div class="app-name">enjoyyy</div>
+            <div class="app-desc">anonymous music sharing</div>
+          </div>
+          <span class="app-toggle">›</span>
+        </div>
+        <div class="app-details">
+          <p>Share music as a mystery experience. No title, no artist - just sound.</p>
+          <ul>
+            <li>Paste a YouTube URL, get an anonymous link</li>
+            <li>Recipients hear the track with a live visualizer</li>
+            <li>Song info reveals only after playback ends</li>
+            <li>Experience music without bias or expectations</li>
+          </ul>
+          <a href="https://enjoyyy.0pon.com" class="app-link">open enjoyyy →</a>
+        </div>
+      </div>
 
-      <a href="https://textarea.0pon.com" class="app-card">
-        <div class="app-name">textarea</div>
-        <div class="app-desc">url-based text editor</div>
-      </a>
+      <div class="app-card" data-url="https://textarea.0pon.com">
+        <div class="app-header">
+          <div>
+            <div class="app-name">textarea</div>
+            <div class="app-desc">url-based text editor</div>
+          </div>
+          <span class="app-toggle">›</span>
+        </div>
+        <div class="app-details">
+          <p>Your document lives in the URL. No account, no server storage.</p>
+          <ul>
+            <li>Start typing - content auto-saves to URL hash</li>
+            <li>Share by copying the URL (it contains everything)</li>
+            <li>Markdown formatting support</li>
+            <li>Export as HTML, text, or QR code</li>
+            <li>Works fully offline</li>
+          </ul>
+          <a href="https://textarea.0pon.com" class="app-link">open textarea →</a>
+        </div>
+      </div>
 
-      <a href="https://cage.0pon.com" class="app-card">
-        <div class="app-name">cage</div>
-        <div class="app-desc">scg automation system</div>
-      </a>
+      <div class="app-card" data-url="https://cage.0pon.com">
+        <div class="app-header">
+          <div>
+            <div class="app-name">cage</div>
+            <div class="app-desc">scg automation system</div>
+          </div>
+          <span class="app-toggle">›</span>
+        </div>
+        <div class="app-details">
+          <p>Security Classification Guide management for DoDM 5200.45 compliance.</p>
+          <ul>
+            <li>Document workflow: Draft → Review → Approved → Published</li>
+            <li>Classification-based access control (U/C/S/TS)</li>
+            <li>Automatic compliance validation</li>
+            <li>PDF generation with proper markings</li>
+            <li>Full audit trail</li>
+          </ul>
+          <a href="https://cage.0pon.com" class="app-link">open cage →</a>
+        </div>
+      </div>
 
-      <a href="https://chat.0pon.com" class="app-card">
-        <div class="app-name">matrix</div>
-        <div class="app-desc">federated chat (district homies)</div>
-      </a>
+      <div class="app-card" data-url="https://chat.0pon.com">
+        <div class="app-header">
+          <div>
+            <div class="app-name">matrix</div>
+            <div class="app-desc">federated chat (district homies)</div>
+          </div>
+          <span class="app-toggle">›</span>
+        </div>
+        <div class="app-details">
+          <p>Private Matrix homeserver for the community. Decentralized, encrypted.</p>
+          <ul>
+            <li>Invite-based access - request via join.0pon.com</li>
+            <li>Use any Matrix client (Element, Cinny, etc.)</li>
+            <li>Auto-join community spaces and rooms</li>
+            <li>End-to-end encryption by default</li>
+            <li>Your account works across all Matrix apps</li>
+          </ul>
+          <a href="https://join.0pon.com" class="app-link">request invite →</a>
+        </div>
+      </div>
 
-      <a href="https://forums.0pon.com" class="app-card">
-        <div class="app-name">forums</div>
-        <div class="app-desc">discussion forum</div>
-      </a>
+      <div class="app-card" data-url="https://forums.0pon.com">
+        <div class="app-header">
+          <div>
+            <div class="app-name">forums</div>
+            <div class="app-desc">discussion forum</div>
+          </div>
+          <span class="app-toggle">›</span>
+        </div>
+        <div class="app-details">
+          <p>Modern discussion forum powered by Flarum.</p>
+          <ul>
+            <li>Create an account and start discussions</li>
+            <li>Tag-based organization</li>
+            <li>Private messages and mentions</li>
+            <li>Best-answer voting for Q&A</li>
+            <li>Markdown formatting</li>
+          </ul>
+          <a href="https://forums.0pon.com" class="app-link">open forums →</a>
+        </div>
+      </div>
 
-      <a href="ts3server://ts3.0pon.com" class="app-card" id="ts3-link">
-        <div class="app-name">voice</div>
-        <div class="app-desc">voice chat server</div>
-      </a>
+      <div class="app-card" id="ts3-link" data-url="ts3server://ts3.0pon.com">
+        <div class="app-header">
+          <div>
+            <div class="app-name">voice</div>
+            <div class="app-desc">voice chat server</div>
+          </div>
+          <span class="app-toggle">›</span>
+        </div>
+        <div class="app-details">
+          <p>TeamSpeak server for voice chat. DEF CON Radio streaming 24/7.</p>
+          <ul>
+            <li>Server: ts3.0pon.com</li>
+            <li>Works with TS3 or TS6 client</li>
+            <li>Channels: Lobby, Hangout, Games, AFK</li>
+            <li>Music Bot channel with DEF CON Radio</li>
+            <li>Create your own temporary channels</li>
+          </ul>
+          <a href="ts3server://ts3.0pon.com" class="app-link" id="ts3-connect">connect now →</a>
+          <a href="https://teamspeak.com/downloads" target="_blank" class="app-link" style="margin-left: 0.5rem;">get client →</a>
+        </div>
+      </div>
     </div>
 
     <span class="about-link" id="about-open">about</span>
@@ -493,27 +703,29 @@
       setInterval(drawCoin, 50);
     })();
 
-    // TeamSpeak fallback modal
+    // TeamSpeak connect with fallback modal
     (function() {
-      const ts3Link = document.getElementById('ts3-link');
       const ts3Modal = document.getElementById('ts3-modal');
       const ts3Close = document.getElementById('ts3-close');
       const ts3Backdrop = document.getElementById('ts3-backdrop');
+      const ts3Connect = document.getElementById('ts3-connect');
 
-      ts3Link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const start = Date.now();
+      if (ts3Connect) {
+        ts3Connect.addEventListener('click', function(e) {
+          e.preventDefault();
+          const start = Date.now();
 
-        // Try to open TeamSpeak
-        window.location.href = 'ts3server://ts3.0pon.com';
+          // Try to open TeamSpeak
+          window.location.href = 'ts3server://ts3.0pon.com';
 
-        // If still here after 1.5s, show fallback modal
-        setTimeout(function() {
-          if (Date.now() - start < 2000 && !document.hidden) {
-            ts3Modal.classList.add('active');
-          }
-        }, 1500);
-      });
+          // If still here after 1.5s, show fallback modal
+          setTimeout(function() {
+            if (Date.now() - start < 2000 && !document.hidden) {
+              ts3Modal.classList.add('active');
+            }
+          }, 1500);
+        });
+      }
 
       function closeTs3Modal() {
         ts3Modal.classList.remove('active');
